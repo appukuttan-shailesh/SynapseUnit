@@ -15,4 +15,3 @@ class ProducesAMPAVector(sciunit.Capability):
         raise NotImplementedError("Must implement produce_AMPA.")
     def calc_tstop(self):
         return self.waiting_period + self.spike_pair_count*(1000/self.frequency) + 200
-        # return 10.0
