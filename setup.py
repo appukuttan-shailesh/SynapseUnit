@@ -16,7 +16,7 @@ json_files = package_files('synapseunit/tests/stimuli')
 
 setup(
     name='synapseunit',
-    version='0.0.2',
+    version='0.0.3',
     author='Justinas Dainauskas, Shailesh Appukuttan',
     author_email='shailesh.appukuttan@unic.cnrs-gif.fr',
     packages=['synapseunit', 'synapseunit.tests', 'synapseunit.capabilities', 'synapseunit.scores'],

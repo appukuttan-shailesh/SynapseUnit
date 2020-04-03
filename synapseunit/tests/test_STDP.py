@@ -7,6 +7,7 @@ except:
     from sciunit.errors import ObservationError
 import synapseunit.capabilities as cap
 from synapseunit.scores import RMSscore
+from datetime import datetime
 import matplotlib
 import matplotlib.pyplot as plt
 import csv
@@ -18,13 +19,14 @@ class STDPtest(sciunit.Test):
     score_type = RMSscore
     valid_protocols = ["ltp", "ltd", "bidirectional"]
 
-    def __init__(self, observation={}, protocol="", name="STDP", output_dir="."):
+    def __init__(self, observation={}, protocol="", name="test_STDP", output_dir=None):
         if protocol not in self.valid_protocols:
             raise ValueError("Test requires 'protocol' parameter to be set from: {}".format(self.valid_protocols))
         super().__init__(observation, name+"_"+protocol)
         self.protocol = protocol
         self.read_protocol_json(os.path.join(self.config_dir, "protocol_{}.json".format(self.protocol)))
-        self.output_dir = output_dir
+        if not output_dir:
+            self.output_dir = os.path.join(".", name+"_"+protocol, datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     def read_protocol_json(self, path):
         with open(path, 'r') as f:
@@ -51,6 +53,12 @@ class STDPtest(sciunit.Test):
         score.description = ("")
 
         # create relevant output files
+        try:
+            if not os.path.exists(self.output_dir):
+                os.makedirs(self.output_dir)
+        except OSError as e:
+            raise OSError("Could not create output directory: {}".format(self.output_dir))
+
         # 1. Create figure: obs vs pred
         delta_t_vector = list(map(int, observation.keys()))
         obs = list(observation.values())
@@ -65,9 +73,10 @@ class STDPtest(sciunit.Test):
         plt.xlabel('delta_t (ms)', fontdict=label_font)
         plt.ylabel('', fontdict=label_font)
         legend = ax.legend(loc='best', shadow=True, fontsize='x-large')
-        plt.show()
         filepath = os.path.join(self.output_dir, 'traces.pdf')
         fig.savefig(filepath, dpi=600)
+        plt.show()
+        plt.close('all')
 
         # 2. Create data file: observation and prediction combined
         result_json = []
